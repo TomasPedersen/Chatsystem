@@ -14,7 +14,8 @@ public class Client {
 
     public static void main(String[] args) {
         try {
-            clientSocket = new Socket("localhost", 2222);
+            clientSocket = new Socket("192.168.1.101", 2222);
+//            clientSocket = new Socket("localhost", 2222);
             inputStream = new Scanner(clientSocket.getInputStream());
         } catch (IOException e) {
             e.printStackTrace();
