@@ -28,6 +28,7 @@ public class Server {
 				System.out.println("Waiting for connection");
 				clientSocket = serverSocket.accept();	// Lyt på serverSocket. Blokerer.
 				inputStream = new Scanner(clientSocket.getInputStream());
+				outputStream = new PrintStream(clientSocket.getOutputStream());
 				System.out.println("Got connection from: " + clientSocket.getInetAddress()+":"+clientSocket.getPort());
 				} catch (IOException e) {
 				e.printStackTrace();
@@ -45,12 +46,16 @@ public class Server {
 						System.out.println(userName+ " wants to JOIN");
 						if(addUser(userName)) {
 							outputStream.println("J_OK");
+							sendList();
 							System.out.println(userName + " accepted");
+						} else{
+							outputStream.println("J_ERR");
+							System.out.println(userName+" rejected");
 						}
 						break;
 					case "ALVE":break;
 					case "DATA":
-						sendToAll("<"+userName+"> "+message.substring(message.indexOf(":")));	// Besked starter efter det første kolon.
+						sendToAll("<"+userName+">"+message.substring( message.indexOf(":")+1 ));	// Besked starter efter det første kolon.
 						break;
 					default:
 						System.out.println("Unknown token");
@@ -61,7 +66,10 @@ public class Server {
 	static boolean addUser(String userName){	//TODO Check brugernavn og tilføj til liste over brugere.
 		return true;
 	}
-	static void sendToAll(String message){
+	static void sendToAll(String message){	//TODO Send noget til alle clienter.
 		System.out.println(message);
+	}
+	static void sendList(){
+		//TODO Send userList til alle brugere.
 	}
 }
