@@ -31,9 +31,10 @@ public class Server {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			while (inputStream.hasNext()) {
+			while (true) {
 				message = inputStream.nextLine();
 				System.out.println(clientSocket.getInetAddress() + " --> " + message);
+
 				if (message.equals("QUIT")) {
 					try {
 						clientSocket.close();

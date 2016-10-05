@@ -13,6 +13,7 @@ public class Client {
     private static Scanner inputStream = null;
 	private static String nick = null;
 	private static Scanner userInput = null;
+	private static String message = null;
 
 	public static void main(String[] args) {
 		userInput = new Scanner(System.in);
@@ -34,6 +35,17 @@ public class Client {
 		//Join server.
 		outputStream.print("JOIN "+nick);
 
+		// Vent på J_OK eller J_ERR
+		switch ( message=inputStream.nextLine()){
+			case "J_OK":
+				System.out.println("Join ok");
+				break;
+			case "J_ERR":
+				System.out.println("Join ikke ok");
+				break;
+			default:
+				System.out.println("Ukendt besked: "+message);
+		}
 	}
 	static boolean userNameOK(String n){
 		if(n.length()>12){
