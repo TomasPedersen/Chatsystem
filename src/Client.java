@@ -11,17 +11,36 @@ public class Client {
     private static Socket clientSocket = null;
     private static PrintStream outputStream = null;
     private static Scanner inputStream = null;
-
+	private static String nick = null;
+	private static Scanner userInput = null;
 
 	public static void main(String[] args) {
-		try {
+		userInput = new Scanner(System.in);
 
+		//Opret forbindelse til server
+		try {
 			clientSocket = new Socket("localhost", 2222);
 			inputStream = new Scanner(clientSocket.getInputStream());
+			outputStream = new PrintStream(clientSocket.getOutputStream());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println(inputStream.nextLine());
-		//TODO Send message to server.
+
+		// Indtast brugernavn
+		System.out.print("Indtast brugernavn: ");
+		while( !(userNameOK(nick = userInput.nextLine())) );	// Indtast brugernavn og check om nick overholder kravene.
+		System.out.println("Dit brugernavn er "+nick);
+
+		//Join server.
+		outputStream.print("JOIN "+nick);
+
+	}
+	static boolean userNameOK(String n){
+		if(n.length()>12){
+			System.out.println("Brugernavn må maksimalt være 12 tegn");
+			return false;
+		}
+		// TODO Check for gyldige tegn, kun bogstaver, tal - og _ er gyldige.
+		return true;
 	}
 }
