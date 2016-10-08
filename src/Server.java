@@ -37,7 +37,7 @@ public class Server {
 					streamToClient.println("Server full");
 				} else {    // Opret og start ny tråd.
 					UserThread t = new UserThread(userThreads, clientSocket);
-					userThreads.add(t);
+					//userThreads.add(t);
 					t.start();
 				}
 			} catch (IOException e) {

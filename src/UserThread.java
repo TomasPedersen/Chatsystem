@@ -16,7 +16,6 @@ public class UserThread extends Thread{
 	public Socket clientSocket = null;
 	public Scanner streamFromClient = null;
 	public PrintStream streamToClient = null;
-	public int userIndex;		// Index i userThreads for denne tråd.
 
 	public ArrayList<UserThread> userThreads = null;
 
@@ -26,7 +25,6 @@ public class UserThread extends Thread{
 	 * @param clientSocket
 	 */
 	public UserThread(ArrayList<UserThread> userThreads, Socket clientSocket) {
-		this.userIndex = userThreads.size()-1;	// Den nye bruger er den sidste i ArrayList<UserThreads>. Så befinder sig på index size()-1.
 		this.lastHeartbeat = LocalTime.now();
 		this.clientSocket = clientSocket;
 		this.userThreads = userThreads;
@@ -55,14 +53,23 @@ public class UserThread extends Thread{
 					if(DEBUG)System.out.println(userName + " sent JOIN");
 					if (addUser(userName)) {
 						streamToClient.println("J_OK");    // Send besked til client at join er accepteret.
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+						streamToClient.println("NOGET DEBUG");
 						sendList();                        // Send opdateret liste over aktive brugere til alle clienter.
 						debug(userName + "@" + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " has joined.");    // Server-debug.
 					} else {
 						streamToClient.println("J_ERR");
 						System.out.println(userName + " rejected");
-						// Brugernavn afvist, fjern denne tråd fra userThreads.
-						userThreads.remove(this.userIndex);
-						// TODO Dræb tråden.
+						try {
+							clientSocket.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						// TODO Dræb tråden. Eller hvad der nu er passende.
 					}
 					break;
 				case "ALVE":
@@ -84,10 +91,13 @@ public class UserThread extends Thread{
 
 	private boolean addUser(String enteringUser) {    //Check brugernavn og tilføj til liste over brugere.
 		for (UserThread u : userThreads) {
-			if (u.userName.equals(enteringUser)) return false;    // Brugernavn eksisterer.
+			if (u.userName.equals(enteringUser)) {
+				debug("addUser(): enteringUser: "+enteringUser+"  u.username: "+u.userName);
+				return false;    // Brugernavn eksisterer.
+			}
 		}
-
 		// Brugernavn findes ikke. Tilføj til liste og returner true.
+		userThreads.add(this);	// Tilføj denne tråd til userThreads.
 		debug(enteringUser + " blev tilføjet til listen over aktive brugere.");
 		return true;
 	}
@@ -99,23 +109,26 @@ public class UserThread extends Thread{
 		}
 	}
 
-	private void sendList() {    //TODO Send liste med alle brugernavne til alle brugere.
-		String userList = "LIST ";
+	private void sendList() {    // Send liste med alle brugernavne til alle brugere.
+		String userList = "LIST";
 		for (UserThread u :            // Lav først en tekststreng med alle brugernavne
 				userThreads) {
-			userList.concat(u.userName);
-			debug("sendList, u.userName: " + u.userName);
+			userList += " "+u.userName;
+			debug("userList: "+userList);
+			debug("sendList(): u.userName: " + u.userName);
 		}
 		// Send derefter til alle brugere.
 		sendToAll(userList);
 
 	}
 
-	public static void debug(String debugMessage) {
+	public void debug(String debugMessage) {
 		if (DEBUG) System.out.println(LocalTime.now() + " " + debugMessage);
 	}
 
-	public static void sendMessage(UserThread client, String message) {
+	public void sendMessage(UserThread client, String message) {
 		client.streamToClient.println(message);
+		this.streamToClient.println(message);
+		debug("sendMessage(): client.userName: "+client.userName);
 	}
 }
