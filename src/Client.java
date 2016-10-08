@@ -40,6 +40,7 @@ public class Client {
 			System.out.println("JOIN "+nick);
 
 			// Vent på J_OK eller J_ERR
+			// Fortsæt til main loop ved J_OK, ellers gentag indtast brugernavn.
 			message = inputStream.nextLine();
 			System.out.println(message);
 			switch ( message ){
@@ -54,6 +55,8 @@ public class Client {
 					System.out.println("Ukendt besked: "+message);
 			}
 		}
+
+		// Main loop
 		// Server har accepteret brugernavn.
 		do {
 			if(userInput.hasNext()) message = userInput.nextLine();	// Tjeck om brugeren har skrevet noget og send det til server. Blokerer ikke.

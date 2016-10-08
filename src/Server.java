@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -15,6 +16,7 @@ public class Server {
 	private static Scanner inputStream = null;
 	private static String message = "NO MESSAGE";
 	private static String userName = null;
+	private static ArrayList<User> activeClients = new ArrayList<>();
 
 	public static void main(String[] args) {
 		try {
@@ -44,16 +46,16 @@ public class Server {
 					case "JOIN":
 						userName = message.split(" ")[1];
 						System.out.println(userName+ " wants to JOIN");
-						if(addUser(userName)) {
-							outputStream.println("J_OK");
-							sendList();
-							System.out.println(userName + " accepted");
+						if(addUser(new User(userName, clientSocket.getInetAddress(), clientSocket.getLocalPort()))) {
+							outputStream.println("J_OK");	// Send besked til client at join er accepteret.
+							sendList();						// Send opdateret liste over aktive brugere til alle clienter.
+							System.out.println(userName + " accepted");	// Server-debug.
 						} else{
 							outputStream.println("J_ERR");
 							System.out.println(userName+" rejected");
 						}
 						break;
-					case "ALVE":break;
+					case "ALVE":break; //TODO Vedligehold liste over heartbeats.
 					case "DATA":
 						sendToAll("<"+userName+">"+message.substring( message.indexOf(":")+1 ));	// Besked starter efter det første kolon.
 						break;
@@ -63,9 +65,21 @@ public class Server {
 			}
 		}
 	}
-	static boolean addUser(String userName){	//TODO Check brugernavn og tilføj til liste over brugere.
+
+	/**
+	 * Check if username is already in use. If not add to list and return true.
+	 * @param enteringUser
+	 * @return true if user accepted.
+	 */
+	static boolean addUser(User enteringUser){	//TODO Check brugernavn og tilføj til liste over brugere.
+		for(User u:activeClients) {
+			if (u.userName.equals(enteringUser.userName)) return false;	// Brugernavn eksisterer.
+		}
+		// Brugernavn findes ikke. Tilføj til list og returner true.
+		activeClients.add(enteringUser);
 		return true;
 	}
+
 	static void sendToAll(String message){	//TODO Send noget til alle clienter.
 		System.out.println(message);
 	}
