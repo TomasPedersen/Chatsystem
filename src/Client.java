@@ -21,7 +21,8 @@ public class Client {
 
 		//Opret forbindelse til server
 		try {
-			clientSocket = new Socket("localhost", 2222);
+			clientSocket = new Socket("192.168.1.101", 2222);
+//			clientSocket = new Socket("localhost", 2222);
 			inputStream = new Scanner(clientSocket.getInputStream());
 			outputStream = new PrintStream(clientSocket.getOutputStream());
 		} catch (IOException e) {
@@ -31,8 +32,8 @@ public class Client {
 		// Indtast brugernavn
 		while (!JOIN_OK) {
 			System.out.print("Indtast brugernavn: ");
-			//while( !(userNameOK(nick = userInput.nextLine())) );	// Indtast brugernavn og check om nick overholder kravene.
-			nick = "Test";
+			while( !(userNameOK(nick = userInput.nextLine())) );	// Indtast brugernavn og check om nick overholder kravene.
+			//nick = "SomeOtherNick";
 			System.out.println("Dit brugernavn er "+nick);
 
 			//Join server.
@@ -59,9 +60,13 @@ public class Client {
 		// Main loop
 		// Server har accepteret brugernavn.
 		do {
-			if(userInput.hasNext()) message = userInput.nextLine();	// Tjeck om brugeren har skrevet noget og send det til server. Blokerer ikke.
-			outputStream.println("DATA "+nick+": "+message);
-			System.out.println("DATA "+nick+": "+message);
+			System.out.println("MAIN LOOP");
+			if(userInput.hasNext()) {
+				System.out.println("hasNext()");
+				message = userInput.nextLine();    // Tjeck om brugeren har skrevet noget og send det til server. Blokerer.
+				outputStream.println("DATA " + nick + ": " + message);
+				System.out.println("DATA " + nick + ": " + message);
+			}
 
 			if(inputStream.hasNext()) System.out.println(inputStream.nextLine());	// Tjeck om der er besked fra server. Skriv det ud. Blokerer ikke.
 		} while (!message.equals("QUIT"));
