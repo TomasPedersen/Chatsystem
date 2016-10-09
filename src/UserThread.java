@@ -39,15 +39,28 @@ public class UserThread extends Thread{
 	@Override
 	public void run() {
 		while (true) {        // Main loop. Ser kontinuert efter nye beskeder i stream.
+			debug("Waiting for next line");
 			messageToParse = streamFromClient.nextLine();
-			debug(clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " --> " + messageToParse);	// Skriver besked til konsol.
-
+			debug(clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " --> " + messageToParse);
 			// Parse for token
-			System.out.println(messageToParse.split(" ")[0]);
+			debug(messageToParse.split(" ")[0]);
 			switch (messageToParse.split(" ")[0]) {
 				case "QUIT":
 					debug("case QUIT:");
-					break;        //TODO håndtér QUIT for client.
+					// User has quit, remove from list.
+					for (UserThread u :
+							userThreads) {
+						if (u.userName.equals(userName)) userThreads.remove(u);
+					}
+					// Send liste til tilbageværende brugere
+					sendList();
+					// Luk socket
+					try {
+						clientSocket.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					break;
 				case "JOIN":
 					userName = messageToParse.split(" ")[1];
 					if(DEBUG)System.out.println(userName + " sent JOIN");
@@ -75,6 +88,7 @@ public class UserThread extends Thread{
 				case "ALVE":
 					break; //TODO Vedligehold liste over heartbeats.
 				case "DATA":
+					debug("Case DATA");
 					sendToAll("<" + userName + ">" + messageToParse.substring(messageToParse.indexOf(":") + 1));    // Besked starter efter det første kolon.
 					break;
 				default:
