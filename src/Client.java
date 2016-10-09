@@ -69,6 +69,7 @@ public class Client {
 			}
 
 			if(inputStream.hasNext()) System.out.println(inputStream.nextLine());	// Tjeck om der er besked fra server. Skriv det ud. Blokerer ikke.
+			System.out.println("Waiting for message from server");
 		} while (!message.equals("QUIT"));
 		try {
 			clientSocket.close();
