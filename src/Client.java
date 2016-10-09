@@ -7,7 +7,8 @@ import java.util.Scanner;
  * Created by tomas on 10/4/16.
  * Connect to server.
  */
-public class Client {
+public class Client implements Runnable{
+	public static final boolean DEBUG = true;
     private static Socket clientSocket = null;
     private static PrintStream outputStream = null;
     private static Scanner inputStream = null;
@@ -33,8 +34,6 @@ public class Client {
 		while (!JOIN_OK) {
 			System.out.print("Indtast brugernavn: ");
 			while( !(userNameOK(nick = userInput.nextLine())) );	// Indtast brugernavn og check om nick overholder kravene.
-			//nick = "SomeOtherNick";
-			System.out.println("Dit brugernavn er "+nick);
 
 			//Join server.
 			outputStream.println("JOIN "+nick);
@@ -50,31 +49,47 @@ public class Client {
 					JOIN_OK = true;
 					break;
 				case "J_ERR":
-					System.out.println("Join ikke ok");
+					System.out.println("Brugernavn afvist af server");
 					break;
 				default:
 					System.out.println("Ukendt besked: "+message);
 			}
 		}
 
-		// Main loop
 		// Server har accepteret brugernavn.
+		// Start tråd til at læse fra server.
+		new Thread(new Client()).start();
+
+		// Main loop. Læser fra tastatur og sender til server.
+		debug("Main loop starter.");
 		do {
-			System.out.println("MAIN LOOP");
 			if(userInput.hasNext()) {
 				System.out.println("hasNext()");
 				message = userInput.nextLine();    // Tjeck om brugeren har skrevet noget og send det til server. Blokerer.
+				if(message.equals("QUIT")) {
+					outputStream.println("QUIT");
+					break;
+				}
 				outputStream.println("DATA " + nick + ": " + message);
-				System.out.println("DATA " + nick + ": " + message);
+				debug("Sent to server: DATA " + nick + ": " + message);
 			}
 
-			if(inputStream.hasNext()) System.out.println(inputStream.nextLine());	// Tjeck om der er besked fra server. Skriv det ud. Blokerer ikke.
-			System.out.println("Waiting for message from server");
+
 		} while (!message.equals("QUIT"));
+
 		try {
 			clientSocket.close();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Tråd der læser fra server og skriver til konsol.
+	 */
+	public void run(){
+		while(true){
+			System.out.println(inputStream.nextLine());
 		}
 	}
 
@@ -85,5 +100,8 @@ public class Client {
 		}
 		// TODO Check for gyldige tegn, kun bogstaver, tal - og _ er gyldige.
 		return true;
+	}
+	public static void debug(String debugMessage){
+		if(DEBUG) System.out.println("**DEBUG**  "+ debugMessage);
 	}
 }
