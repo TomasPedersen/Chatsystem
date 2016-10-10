@@ -17,6 +17,7 @@ public class Server {
 	private static PrintStream streamToClient = null;
 
 	public static void main(String[] args) {
+		new HeartbeatThread(userThreads).start();	// Start heartbeattråd
 		try {
 			serverSocket = new ServerSocket(2222);    // Opret serverSocket
 			System.out.println("serverSocket created on " + serverSocket.getInetAddress() + ":" + serverSocket.getLocalPort());
@@ -34,9 +35,15 @@ public class Server {
 				// Undersøg om der er plads til flere brugere.
 				if (userThreads.size() >= MAX_USERS) {
 					streamToClient.println("Server full");
+					Debug.debug(1, "Server full");
+					try {
+						clientSocket.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				} else {    // Opret og start ny tråd.
 					UserThread t = new UserThread(userThreads, clientSocket);
-					t.start();	// Start userThread. Tråd tjekker om brugernavn er ok.
+					t.start();	// Start userThread.
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
