@@ -41,6 +41,7 @@ public class UserThread extends Thread{
 			Debug.debug(2,"Waiting for next line");
 			messageToParse = streamFromClient.nextLine();
 			Debug.debug(clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " --> " + messageToParse);
+
 			// Parse for token
 			switch (messageToParse.split(" ")[0]) {
 				case "QUIT":
@@ -77,7 +78,7 @@ public class UserThread extends Thread{
 					break; //TODO Vedligehold liste over heartbeats.
 				case "DATA":
 					Debug.debug("Case DATA:");
-					sendToAll("<" + userName + ">" + messageToParse.substring(messageToParse.indexOf(":") + 1));    // Besked starter efter det første kolon.
+					sendToAll(messageToParse);    // Ved DATA skal beskeden blot sendes videre til alle andre.
 					break;
 				default:
 					Debug.debug("Unknown token");
@@ -85,16 +86,15 @@ public class UserThread extends Thread{
 		}
 	}
 
-		/**
-		 * Check if username is already in use. If not add to list and return true.
-		 * @param enteringUser
-		 * @return true if user accepted.
-		 */
-
+	/**
+	 * Check if username is already in use. If not add to list and return true.
+	 * @param enteringUser
+	 * @return true if user accepted.
+	 */
 	private boolean addUser(String enteringUser) {    //Check brugernavn og tilføj til liste over brugere.
 		for (UserThread u : userThreads) {
 			if (u.userName.equals(enteringUser)) {
-				Debug.debug("addUser(): enteringUser: "+enteringUser+"  u.username: "+u.userName);
+				Debug.debug("addUser( "+enteringUser+")   u.username: "+u.userName);
 				return false;    // Brugernavn eksisterer.
 			}
 		}
@@ -117,16 +117,13 @@ public class UserThread extends Thread{
 				userThreads) {
 			userList += " "+u.userName;
 			Debug.debug("userList: "+userList);
-			Debug.debug("sendList(): u.userName: " + u.userName);
 		}
 		// Send derefter til alle brugere.
 		sendToAll(userList);
-
 	}
 
 	public void sendMessage(UserThread client, String message) {
+		Debug.debug("sendMessage( "+client+", "+message+" )");
 		client.streamToClient.println(message);
-		this.streamToClient.println(message);
-		Debug.debug("sendMessage(): client.userName: "+client.userName);
 	}
 }

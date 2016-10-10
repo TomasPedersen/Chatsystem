@@ -60,9 +60,9 @@ public class Client implements Runnable{
 
 		// Main loop. Læser fra tastatur og sender til server.
 		Debug.debug(2,"Main loop starter.");
-		do {
+		while(true) {
 			userMessage = userScanner.nextLine();    // Tjeck om brugeren har skrevet noget. Blokerer.
-			if(userMessage.equals("/quit")) {
+			if (userMessage.equals("/quit")) {    // Brugeren har sagt /quit. Send QUIT til server. Luk socket og luk programmet.
 				Debug.debug("Bruger sagde /quit");
 				outputStream.println("QUIT");
 				try {
@@ -70,15 +70,12 @@ public class Client implements Runnable{
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				System.exit(0);
+				System.exit(0);    // Afslut clienten.
 			}
-			outputStream.println("DATA " + nick + ": " + userMessage);
-			Debug.debug(1,"Sent to server: DATA " + nick + ": " + userMessage);
-		} while (!userMessage.equals("QUIT"));
-		try {
-			clientSocket.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+
+			// Normal besked. Send teksten til server med DATA + nick foran.
+			outputStream.println("DATA " + nick + " " + userMessage);
+			Debug.debug(1, "Sent to server: DATA " + nick + " " + userMessage);
 		}
 	}
 
@@ -86,8 +83,16 @@ public class Client implements Runnable{
 	 * Tråd der læser fra server og skriver til konsol.
 	 */
 	public void run(){
-		while(true){
-			System.out.println("Server said: "+inputStream.nextLine());  // Skriv helt ukritisk til konsol hvad server sender.
+		String serverMessage = "";
+		while(true){	// Parse tokens from server.
+			Debug.debug(2, "Waiting for serverMessage.");
+			serverMessage = inputStream.nextLine();
+			//Debug.debug(2,"Server said: "+serverMessage);
+			switch(serverMessage.split(" ")[0]){
+				case "DATA":
+					String userName = serverMessage.split(" ")[1];
+					System.out.println("<"+userName+"> "+serverMessage.substring( 6+userName.length() ));	// DATA plus et mellemrum = 5 tegn.
+			}
 		}
 	}
 
