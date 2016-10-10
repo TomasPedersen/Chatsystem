@@ -21,8 +21,9 @@ public class Client implements Runnable{
 
 		//Opret forbindelse til server
 		try {
-//			clientSocket = new Socket("192.168.1.101", 2222);
-			clientSocket = new Socket("localhost", 2222);
+			clientSocket = new Socket("192.168.1.101", 2222);
+			//clientSocket = new Socket("localhost", 2222);
+			//clientSocket = new Socket("patina.dyndns.dk", 2222);
 			inputStream = new Scanner(clientSocket.getInputStream());
 			outputStream = new PrintStream(clientSocket.getOutputStream());
 		} catch (IOException e) {
@@ -92,6 +93,9 @@ public class Client implements Runnable{
 				case "DATA":
 					String userName = serverMessage.split(" ")[1];
 					System.out.println("<"+userName+"> "+serverMessage.substring( 6+userName.length() ));	// DATA plus et mellemrum = 5 tegn.
+					break;
+				case "LIST":
+					System.out.println(serverMessage);
 			}
 		}
 	}
