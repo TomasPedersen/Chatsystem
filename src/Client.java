@@ -8,22 +8,21 @@ import java.util.Scanner;
  * Connect to server.
  */
 public class Client implements Runnable{
-	public static final boolean DEBUG = true;
     private static Socket clientSocket = null;
     private static PrintStream outputStream = null;
     private static Scanner inputStream = null;
 	private static String nick = null;
-	private static Scanner userInput = null;
-	private static String message = null;
+	private static Scanner userScanner = null;
+	private static String userMessage = null;
 	private static boolean JOIN_OK = false;
 
 	public static void main(String[] args) {
-		userInput = new Scanner(System.in);
+		userScanner = new Scanner(System.in);
 
 		//Opret forbindelse til server
 		try {
-			clientSocket = new Socket("192.168.1.101", 2222);
-//			clientSocket = new Socket("localhost", 2222);
+//			clientSocket = new Socket("192.168.1.101", 2222);
+			clientSocket = new Socket("localhost", 2222);
 			inputStream = new Scanner(clientSocket.getInputStream());
 			outputStream = new PrintStream(clientSocket.getOutputStream());
 		} catch (IOException e) {
@@ -33,26 +32,25 @@ public class Client implements Runnable{
 		// Indtast brugernavn
 		while (!JOIN_OK) {
 			System.out.print("Indtast brugernavn: ");
-			while( !(userNameOK(nick = userInput.nextLine())) );	// Indtast brugernavn og check om nick overholder kravene.
+			while( !(userNameOK(nick = userScanner.nextLine())) );	// Indtast brugernavn og check om nick overholder kravene.
 
 			//Join server.
 			outputStream.println("JOIN "+nick);
-			System.out.println("JOIN "+nick);
+			Debug.debug(2,"Sent to server:  JOIN "+nick);
 
 			// Vent på J_OK eller J_ERR
 			// Fortsæt til main loop ved J_OK, ellers gentag indtast brugernavn.
-			message = inputStream.nextLine();
-			System.out.println(message);
-			switch ( message ){
+			userMessage = inputStream.nextLine();
+			switch (userMessage){
 				case "J_OK":
-					System.out.println("Join ok");
+					System.out.println("Join accepteret af server");
 					JOIN_OK = true;
 					break;
 				case "J_ERR":
 					System.out.println("Brugernavn afvist af server");
 					break;
 				default:
-					System.out.println("Ukendt besked: "+message);
+					System.out.println("Ukendt besked: "+ userMessage);
 			}
 		}
 
@@ -61,22 +59,22 @@ public class Client implements Runnable{
 		new Thread(new Client()).start();
 
 		// Main loop. Læser fra tastatur og sender til server.
-		debug("Main loop starter.");
+		Debug.debug(2,"Main loop starter.");
 		do {
-			if(userInput.hasNext()) {
-				System.out.println("hasNext()");
-				message = userInput.nextLine();    // Tjeck om brugeren har skrevet noget og send det til server. Blokerer.
-				if(message.equals("QUIT")) {
-					outputStream.println("QUIT");
-					break;
+			userMessage = userScanner.nextLine();    // Tjeck om brugeren har skrevet noget. Blokerer.
+			if(userMessage.equals("/quit")) {
+				Debug.debug("Bruger sagde /quit");
+				outputStream.println("QUIT");
+				try {
+					clientSocket.close();
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
-				outputStream.println("DATA " + nick + ": " + message);
-				debug("Sent to server: DATA " + nick + ": " + message);
+				System.exit(0);
 			}
-
-
-		} while (!message.equals("QUIT"));
-
+			outputStream.println("DATA " + nick + ": " + userMessage);
+			Debug.debug(1,"Sent to server: DATA " + nick + ": " + userMessage);
+		} while (!userMessage.equals("QUIT"));
 		try {
 			clientSocket.close();
 		} catch (IOException e) {
@@ -89,7 +87,7 @@ public class Client implements Runnable{
 	 */
 	public void run(){
 		while(true){
-			System.out.println(inputStream.nextLine());
+			System.out.println("Server said: "+inputStream.nextLine());  // Skriv helt ukritisk til konsol hvad server sender.
 		}
 	}
 
@@ -100,8 +98,5 @@ public class Client implements Runnable{
 		}
 		// TODO Check for gyldige tegn, kun bogstaver, tal - og _ er gyldige.
 		return true;
-	}
-	public static void debug(String debugMessage){
-		if(DEBUG) System.out.println("**DEBUG**  "+ debugMessage);
 	}
 }
