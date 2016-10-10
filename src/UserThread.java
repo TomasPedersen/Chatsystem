@@ -75,7 +75,8 @@ public class UserThread extends Thread{
 					break;
 				case "ALVE":
 					Debug.debug("case ALVE:");
-					break; //TODO Vedligehold liste over heartbeats.
+					this.lastHeartbeat = LocalTime.now();	// Heartbeat modtaget, tid for sidste heartbeat for dette objekt sat til klokken nu.
+					break;
 				case "DATA":
 					Debug.debug("Case DATA:");
 					sendToAll(messageToParse);    // Ved DATA skal beskeden blot sendes videre til alle andre.
@@ -103,6 +104,7 @@ public class UserThread extends Thread{
 		Debug.debug(enteringUser + " blev tilføjet til listen over aktive brugere.");
 		return true;
 	}
+	// TODO Skriv removeUser()
 
 	private void sendToAll(String message) {    // Send noget til alle clienter.
 		Debug.debug("sendToAll(" + message + ")");
