@@ -20,7 +20,7 @@ public class Server {
 		new HeartbeatThread(userThreads).start();	// Start heartbeattråd
 		try {
 			serverSocket = new ServerSocket(2222);    // Opret serverSocket
-			System.out.println("serverSocket created on " + serverSocket.getInetAddress() + ":" + serverSocket.getLocalPort());
+			Debug.debug(1,"serverSocket created on " + serverSocket.getInetAddress() + ":" + serverSocket.getLocalPort());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

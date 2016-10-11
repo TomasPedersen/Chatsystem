@@ -64,9 +64,10 @@ public class UserThread extends Thread{
 					Debug.debug("Case JOIN:");
 					userName = messageToParse.split(" ")[1];
 					Debug.debug("JOIN from "+userName);
-					if (addUser(userName)) {	// Tjeck brugernavn.
-						streamToClient.println("J_OK");    // Send besked til client at join er accepteret.
-						sendList();                        // Send opdateret liste over aktive brugere til alle clienter.
+					if (addUser(userName)) {				// Tjeck brugernavn.
+						lastHeartbeat = LocalTime.now();	// Opdater heartbeat. Bliver sat ved connection, men timer ud hvis det tager for lang tid at skrive et navn.
+						streamToClient.println("J_OK");		// Send besked til client at join er accepteret.
+						sendList();							// Send opdateret liste over aktive brugere til alle clienter.
 						Debug.debug(userName + "@" + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " has joined.");    // Server-debug.
 					} else {
 						streamToClient.println("J_ERR");
@@ -74,7 +75,7 @@ public class UserThread extends Thread{
 					}
 					break;
 				case "ALVE":
-					Debug.debug("case ALVE:");
+					Debug.debug("Heartbeat received from "+clientSocket.getInetAddress());
 					this.lastHeartbeat = LocalTime.now();	// Heartbeat modtaget, tid for sidste heartbeat for dette objekt sat til klokken nu.
 					break;
 				case "DATA":

@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 /**
@@ -58,6 +59,9 @@ public class Client implements Runnable{
 		// Server har accepteret brugernavn.
 		// Start tråd til at læse fra server.
 		new Thread(new Client()).start();
+		// Start ClientHeartbeat tråd.
+		new Thread(new ClientHeartbeat(outputStream)).start();
+
 
 		// Main loop. Læser fra tastatur og sender til server.
 		Debug.debug(2,"Main loop starter.");
@@ -87,8 +91,13 @@ public class Client implements Runnable{
 		String serverMessage = "";
 		while(true){	// Parse tokens from server.
 			Debug.debug(2, "Waiting for serverMessage.");
-			serverMessage = inputStream.nextLine();
-			//Debug.debug(2,"Server said: "+serverMessage);
+			try {
+				serverMessage = inputStream.nextLine();
+			} catch (NoSuchElementException e) {
+				Debug.debug(1,"No line found. Probably means server closed socket. Exiting.");
+				System.exit(0);
+			}
+			Debug.debug(2,"Server said: "+serverMessage);
 			switch(serverMessage.split(" ")[0]){
 				case "DATA":
 					String userName = serverMessage.split(" ")[1];

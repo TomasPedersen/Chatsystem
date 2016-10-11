@@ -30,6 +30,7 @@ public class HeartbeatThread extends Thread {
 					}
 					userThreads.remove(u);
 					Debug.debug(2, "Thread was removed: "+u);
+					break;	// TODO Dette er et hack. Uden break fås ConcurrentModificationException efter sletning af sidste element.
 				}
 			}
 			try {
