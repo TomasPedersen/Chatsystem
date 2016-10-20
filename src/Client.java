@@ -22,8 +22,8 @@ public class Client implements Runnable{
 
 		//Opret forbindelse til server
 		try {
-			clientSocket = new Socket("192.168.1.101", 2222);
-			//clientSocket = new Socket("localhost", 2222);
+			//clientSocket = new Socket("192.168.1.101", 2222);
+			clientSocket = new Socket("localhost", 2222);
 			//clientSocket = new Socket("patina.dyndns.dk", 2222);
 			inputStream = new Scanner(clientSocket.getInputStream());
 			outputStream = new PrintStream(clientSocket.getOutputStream());

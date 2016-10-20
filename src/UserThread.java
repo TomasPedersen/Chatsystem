@@ -50,6 +50,7 @@ public class UserThread extends Thread{
 					for (UserThread u :
 							userThreads) {
 						if (u.userName.equals(userName)) userThreads.remove(u);
+						break;		// TODO Hack. Undgå ConcurrentModificationException.
 					}
 					// Send liste til tilbageværende brugere
 					sendList();
@@ -60,6 +61,7 @@ public class UserThread extends Thread{
 						e.printStackTrace();
 					}
 					break;
+					// TODO Luk denne tråd.
 				case "JOIN":
 					Debug.debug("Case JOIN:");
 					userName = messageToParse.split(" ")[1];

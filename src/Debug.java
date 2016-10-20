@@ -5,7 +5,7 @@ import java.time.LocalTime;
  * Created by tomas on 10/10/16.
  */
 public class Debug {
-	public static final int DEBUG_LEVEL = 0;	// 0, 1 eller 2 er brugbare værdier.
+	public static final int DEBUG_LEVEL = 0;	// 0, 1, 2 eller 3 er brugbare værdier.
 
 	public static void debug(String debugMessage) {
 		debug(1, debugMessage);
