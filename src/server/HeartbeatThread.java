@@ -1,6 +1,9 @@
+package server;
+
 import java.io.IOException;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import util.*;
 
 /**
  * Created by tomas on 10/10/16.

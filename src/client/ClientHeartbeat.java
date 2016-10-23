@@ -1,4 +1,7 @@
+package client;
+
 import java.io.PrintStream;
+import util.*;
 
 /**
  * Created by tomas on 10/11/16.
@@ -10,6 +13,7 @@ public class ClientHeartbeat implements Runnable {
 	public ClientHeartbeat(PrintStream streamToServer){
 		this.streamToServer = streamToServer;
 	}
+
 	@Override
 	public void run() {
 		while(true) {

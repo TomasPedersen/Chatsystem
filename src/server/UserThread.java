@@ -1,9 +1,12 @@
+package server;
+
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Scanner;
+import util.*;
 
 /**
  * Created by tomas on 10/5/16.
@@ -70,7 +73,7 @@ public class UserThread extends Thread{
 						lastHeartbeat = LocalTime.now();	// Opdater heartbeat. Bliver sat ved connection, men timer ud hvis det tager for lang tid at skrive et navn.
 						streamToClient.println("J_OK");		// Send besked til client at join er accepteret.
 						sendList();							// Send opdateret liste over aktive brugere til alle clienter.
-						Debug.debug(userName + "@" + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " has joined.");    // Server-debug.
+						Debug.debug(userName + "@" + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " has joined.");    // server.Server-debug.
 					} else {
 						streamToClient.println("J_ERR");
 						Debug.debug(userName + " was rejected");

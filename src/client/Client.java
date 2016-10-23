@@ -1,8 +1,11 @@
+package client;
+
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import util.*;
 
 /**
  * Created by tomas on 10/4/16.
@@ -15,16 +18,32 @@ public class Client implements Runnable{
 	private static String nick = null;
 	private static Scanner userScanner = null;
 	private static String userMessage = null;
+	private static String serverMessage = null;
 	private static boolean JOIN_OK = false;
 
 	public static void main(String[] args) {
-		userScanner = new Scanner(System.in);
+		String hostName = "localhost";
+		int portNumber = 2222;
+		int debugLevel = 0;
+
+		switch (args.length){
+			case 3:
+				debugLevel = Integer.getInteger(args[2]);
+			case 2:
+				portNumber = Integer.getInteger(args[1]);
+			case 1:
+				hostName = args[0];
+			case 0:
+				System.out.println("Using hostname: "+hostName+":"+portNumber+"  debuglevel 0");
+			default:
+				System.out.println("Usage: client hostname portnumber debuglevel");
+		}
+		// Create debug object
+		Debug d = new Debug(debugLevel);
 
 		//Opret forbindelse til server
 		try {
-			//clientSocket = new Socket("192.168.1.101", 2222);
-			clientSocket = new Socket("localhost", 2222);
-			//clientSocket = new Socket("patina.dyndns.dk", 2222);
+			clientSocket = new Socket(hostName, portNumber);
 			inputStream = new Scanner(clientSocket.getInputStream());
 			outputStream = new PrintStream(clientSocket.getOutputStream());
 		} catch (IOException e) {
@@ -32,18 +51,19 @@ public class Client implements Runnable{
 		}
 
 		// Indtast brugernavn
+		userScanner = new Scanner(System.in);
 		while (!JOIN_OK) {
 			System.out.print("Indtast brugernavn: ");
 			while( !(userNameOK(nick = userScanner.nextLine())) );	// Indtast brugernavn og check om nick overholder kravene.
 
 			//Join server.
 			outputStream.println("JOIN "+nick);
-			Debug.debug(2,"Sent to server:  JOIN "+nick);
+			d.debug(2,"Sent to server:  JOIN "+nick);
 
 			// Vent på J_OK eller J_ERR
 			// Fortsæt til main loop ved J_OK, ellers gentag indtast brugernavn.
-			userMessage = inputStream.nextLine();
-			switch (userMessage){
+			serverMessage = inputStream.nextLine();
+			switch (serverMessage){
 				case "J_OK":
 					System.out.println("Join accepteret af server");
 					JOIN_OK = true;
@@ -52,11 +72,11 @@ public class Client implements Runnable{
 					System.out.println("Brugernavn afvist af server");
 					break;
 				default:
-					System.out.println("Ukendt besked: "+ userMessage);
+					System.out.println("Server sendte ukendt besked: "+ serverMessage);
 			}
 		}
 
-		// Server har accepteret brugernavn.
+		// server.Server har accepteret brugernavn.
 		// Start tråd til at læse fra server.
 		new Thread(new Client()).start();
 		// Start ClientHeartbeat tråd.
@@ -97,7 +117,7 @@ public class Client implements Runnable{
 				Debug.debug(1,"No line found. Probably means server closed socket. Exiting.");
 				System.exit(0);
 			}
-			Debug.debug(2,"Server said: "+serverMessage);
+			Debug.debug(2,"server.Server said: "+serverMessage);
 			switch(serverMessage.split(" ")[0]){
 				case "DATA":
 					String userName = serverMessage.split(" ")[1];

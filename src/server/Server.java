@@ -1,9 +1,11 @@
+package server;
+
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.time.LocalTime;
 import java.util.ArrayList;
+import util.*;
 
 /**
  * Created by tomas on 10/4/16.
@@ -34,8 +36,8 @@ public class Server {
 
 				// Undersøg om der er plads til flere brugere.
 				if (userThreads.size() >= MAX_USERS) {
-					streamToClient.println("Server full");
-					Debug.debug(1, "Server full");
+					streamToClient.println("server.Server full");
+					Debug.debug(1, "server.Server full");
 					try {
 						clientSocket.close();
 					} catch (IOException e) {
