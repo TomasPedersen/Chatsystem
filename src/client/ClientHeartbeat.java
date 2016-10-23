@@ -1,13 +1,14 @@
 package client;
 
 import java.io.PrintStream;
-import util.*;
+
+import static client.Client.d;
 
 /**
  * Created by tomas on 10/11/16.
  */
 public class ClientHeartbeat implements Runnable {
-	public static final int HEARTBEAT_TIMEOUT_MILLIS = 59000;
+	private final int HEARTBEAT_TIME_MILLIS = 59000;
 	PrintStream streamToServer = null;
 
 	public ClientHeartbeat(PrintStream streamToServer){
@@ -18,9 +19,9 @@ public class ClientHeartbeat implements Runnable {
 	public void run() {
 		while(true) {
 			streamToServer.println("ALVE");            // Send heartbeat
-			Debug.debug(2, "Heartbeat sent.");
+			d.debug(2, "Heartbeat sent.");
 			try {
-				Thread.sleep(HEARTBEAT_TIMEOUT_MILLIS);    // Vent på timeout.
+				Thread.sleep(HEARTBEAT_TIME_MILLIS);    // Vent på at tiden går.
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

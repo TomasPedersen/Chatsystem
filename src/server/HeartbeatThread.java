@@ -3,7 +3,9 @@ package server;
 import java.io.IOException;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import util.*;
+
+import static server.Server.d;
+
 
 /**
  * Created by tomas on 10/10/16.
@@ -20,7 +22,7 @@ public class HeartbeatThread extends Thread {
 	@Override
 	public void run() {
 		while(true){
-			Debug.debug(3, "Heartbeat check");
+			d.debug(3, "Heartbeat check");
 			for (UserThread u :
 					userThreads) {
 				// Check for hver userThread om forskellen mellem lastHeartbeat og now() er mere end 59 sekunder.
@@ -32,7 +34,7 @@ public class HeartbeatThread extends Thread {
 						e.printStackTrace();
 					}
 					userThreads.remove(u);
-					Debug.debug(2, "Thread was removed: "+u);
+					d.debug(2, "Thread was removed: "+u);
 					break;	// TODO Dette er et hack. Uden break fås ConcurrentModificationException efter sletning af sidste element.
 				}
 			}

@@ -20,11 +20,13 @@ public class Client implements Runnable{
 	private static String userMessage = null;
 	private static String serverMessage = null;
 	private static boolean JOIN_OK = false;
+	static int debugLevel;
+	static Debug d;
 
 	public static void main(String[] args) {
 		String hostName = "localhost";
 		int portNumber = 2222;
-		int debugLevel = 0;
+		debugLevel = 3;
 
 		switch (args.length){
 			case 3:
@@ -39,7 +41,7 @@ public class Client implements Runnable{
 				System.out.println("Usage: client hostname portnumber debuglevel");
 		}
 		// Create debug object
-		Debug d = new Debug(debugLevel);
+		d = new Debug(debugLevel);
 
 		//Opret forbindelse til server
 		try {
@@ -84,11 +86,11 @@ public class Client implements Runnable{
 
 
 		// Main loop. Læser fra tastatur og sender til server.
-		Debug.debug(2,"Main loop starter.");
+		d.debug(2,"Main loop starter.");
 		while(true) {
 			userMessage = userScanner.nextLine();    // Tjeck om brugeren har skrevet noget. Blokerer.
 			if (userMessage.equals("/quit")) {    // Brugeren har sagt /quit. Send QUIT til server. Luk socket og luk programmet.
-				Debug.debug("Bruger sagde /quit");
+				d.debug("Bruger sagde /quit");
 				outputStream.println("QUIT");
 				try {
 					clientSocket.close();
@@ -100,7 +102,7 @@ public class Client implements Runnable{
 
 			// Normal besked. Send teksten til server med DATA + nick foran.
 			outputStream.println("DATA " + nick + " " + userMessage);
-			Debug.debug(1, "Sent to server: DATA " + nick + " " + userMessage);
+			d.debug(1, "Sent to server: DATA " + nick + " " + userMessage);
 		}
 	}
 
@@ -110,14 +112,14 @@ public class Client implements Runnable{
 	public void run(){
 		String serverMessage = "";
 		while(true){	// Parse tokens from server.
-			Debug.debug(2, "Waiting for serverMessage.");
+			d.debug(2, "Waiting for serverMessage.");
 			try {
 				serverMessage = inputStream.nextLine();
 			} catch (NoSuchElementException e) {
-				Debug.debug(1,"No line found. Probably means server closed socket. Exiting.");
+				d.debug(1,"No line found. Probably means server closed socket. Exiting.");
 				System.exit(0);
 			}
-			Debug.debug(2,"server.Server said: "+serverMessage);
+			d.debug(2,"server.Server said: "+serverMessage);
 			switch(serverMessage.split(" ")[0]){
 				case "DATA":
 					String userName = serverMessage.split(" ")[1];

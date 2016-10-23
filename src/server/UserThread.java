@@ -6,7 +6,8 @@ import java.net.Socket;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Scanner;
-import util.*;
+
+import static server.Server.d;
 
 /**
  * Created by tomas on 10/5/16.
@@ -41,14 +42,14 @@ public class UserThread extends Thread{
 	@Override
 	public void run() {
 		while (true) {        // Main loop. Ser kontinuert efter nye beskeder i stream.
-			Debug.debug(2,"Waiting for next line");
+			d.debug(2,"Waiting for next line");
 			messageToParse = streamFromClient.nextLine();
-			Debug.debug(clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " --> " + messageToParse);
+			d.debug(clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " --> " + messageToParse);
 
 			// Parse for token
 			switch (messageToParse.split(" ")[0]) {
 				case "QUIT":
-					Debug.debug("case QUIT:");
+					d.debug("case QUIT:");
 					// User has quit, remove from list.
 					for (UserThread u :
 							userThreads) {
@@ -66,29 +67,29 @@ public class UserThread extends Thread{
 					break;
 					// TODO Luk denne tråd.
 				case "JOIN":
-					Debug.debug("Case JOIN:");
+					d.debug("Case JOIN:");
 					userName = messageToParse.split(" ")[1];
-					Debug.debug("JOIN from "+userName);
+					d.debug("JOIN from "+userName);
 					if (addUser(userName)) {				// Tjeck brugernavn.
 						lastHeartbeat = LocalTime.now();	// Opdater heartbeat. Bliver sat ved connection, men timer ud hvis det tager for lang tid at skrive et navn.
 						streamToClient.println("J_OK");		// Send besked til client at join er accepteret.
 						sendList();							// Send opdateret liste over aktive brugere til alle clienter.
-						Debug.debug(userName + "@" + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " has joined.");    // server.Server-debug.
+						d.debug(userName + "@" + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " has joined.");    // server.Server-debug.
 					} else {
 						streamToClient.println("J_ERR");
-						Debug.debug(userName + " was rejected");
+						d.debug(userName + " was rejected");
 					}
 					break;
 				case "ALVE":
-					Debug.debug("Heartbeat received from "+clientSocket.getInetAddress());
+					d.debug("Heartbeat received from "+clientSocket.getInetAddress());
 					this.lastHeartbeat = LocalTime.now();	// Heartbeat modtaget, tid for sidste heartbeat for dette objekt sat til klokken nu.
 					break;
 				case "DATA":
-					Debug.debug("Case DATA:");
+					d.debug("Case DATA:");
 					sendToAll(messageToParse);    // Ved DATA skal beskeden blot sendes videre til alle andre.
 					break;
 				default:
-					Debug.debug("Unknown token");
+					d.debug("Unknown token");
 			}
 		}
 	}
@@ -101,19 +102,19 @@ public class UserThread extends Thread{
 	private boolean addUser(String enteringUser) {    //Check brugernavn og tilføj til liste over brugere.
 		for (UserThread u : userThreads) {
 			if (u.userName.equals(enteringUser)) {
-				Debug.debug("addUser( "+enteringUser+")   u.username: "+u.userName);
+				d.debug("addUser( "+enteringUser+")   u.username: "+u.userName);
 				return false;    // Brugernavn eksisterer.
 			}
 		}
 		// Brugernavn findes ikke. Tilføj til liste og returner true.
 		userThreads.add(this);	// Tilføj denne tråd til userThreads.
-		Debug.debug(enteringUser + " blev tilføjet til listen over aktive brugere.");
+		d.debug(enteringUser + " blev tilføjet til listen over aktive brugere.");
 		return true;
 	}
 	// TODO Skriv removeUser()
 
 	private void sendToAll(String message) {    // Send noget til alle clienter.
-		Debug.debug("sendToAll(" + message + ")");
+		d.debug("sendToAll(" + message + ")");
 		for (UserThread u : userThreads) {
 			sendMessage(u, message);
 		}
@@ -124,14 +125,14 @@ public class UserThread extends Thread{
 		for (UserThread u :            // Lav først en tekststreng med alle brugernavne
 				userThreads) {
 			userList += " "+u.userName;
-			Debug.debug("userList: "+userList);
+			d.debug("userList: "+userList);
 		}
 		// Send derefter til alle brugere.
 		sendToAll(userList);
 	}
 
 	public void sendMessage(UserThread client, String message) {
-		Debug.debug("sendMessage( "+client+", "+message+" )");
+		d.debug("sendMessage( "+client+", "+message+" )");
 		client.streamToClient.println(message);
 	}
 }
