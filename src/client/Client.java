@@ -30,9 +30,9 @@ public class Client implements Runnable{
 
 		switch (args.length){
 			case 3:
-				debugLevel = Integer.getInteger(args[2]);
+				debugLevel = Integer.parseInt(args[2]);
 			case 2:
-				portNumber = Integer.getInteger(args[1]);
+				portNumber = Integer.parseInt(args[1]);
 			case 1:
 				hostName = args[0];
 			case 0:

@@ -28,9 +28,9 @@ public class Server {
 
 		switch (args.length){
 			case 2:
-				debugLevel = Integer.getInteger(args[1]);
+				debugLevel = Integer.parseInt(args[1]);
 			case 1:
-				portNumber = Integer.getInteger(args[0]);
+				portNumber = Integer.parseInt(args[0]);
 			case 0:
 				System.out.println("Using portnumber "+portNumber+"  debuglevel "+debugLevel);
 				break;
