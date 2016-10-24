@@ -20,13 +20,13 @@ public class Client implements Runnable{
 	private static String userMessage = null;
 	private static String serverMessage = null;
 	private static boolean JOIN_OK = false;
-	static int debugLevel;
-	static Debug d;
+	static Debug d;		// Initialiser Debug object. Skal importeres static i andre klasser.
 
 	public static void main(String[] args) {
+		// Default værdier hvis intet angivet på kommandolinie.
 		String hostName = "localhost";
 		int portNumber = 2222;
-		debugLevel = 3;
+		int debugLevel = 0;
 
 		switch (args.length){
 			case 3:

@@ -22,23 +22,24 @@ public class Server {
 
 
 	public static void main(String[] args) {
+		// Default værdier hvis intet angivet på kommandolinie.
 		int portNumber = 2222;
 		int debugLevel = 0;
 
 		switch (args.length){
 			case 2:
-				debugLevel = Integer.getInteger(args[2]);
+				debugLevel = Integer.getInteger(args[1]);
 			case 1:
-				portNumber = Integer.getInteger(args[1]);
+				portNumber = Integer.getInteger(args[0]);
 			case 0:
-				System.out.println("Using portnumber "+portNumber+"  debuglevel 0");
+				System.out.println("Using portnumber "+portNumber+"  debuglevel "+debugLevel);
 				break;
 			default:
 				System.out.println("Usage: server portnumber debuglevel");
 				System.exit(1);
 		}
 		// Opret debug objekt.
-		Debug d = new Debug(debugLevel);
+		d = new Debug(debugLevel);
 
 		new HeartbeatThread(userThreads).start();	// Start heartbeattråd
 		try {
