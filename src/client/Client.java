@@ -36,7 +36,8 @@ public class Client implements Runnable{
 			case 1:
 				hostName = args[0];
 			case 0:
-				System.out.println("Using hostname: "+hostName+":"+portNumber+"  debuglevel 0");
+				System.out.println("Using "+hostName+":"+portNumber+"  debuglevel 0");
+				break;
 			default:
 				System.out.println("Usage: client hostname portnumber debuglevel");
 		}
