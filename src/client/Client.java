@@ -36,7 +36,7 @@ public class Client implements Runnable{
 			case 1:
 				hostName = args[0];
 			case 0:
-				System.out.println("Using "+hostName+":"+portNumber+"  debuglevel 0");
+				System.out.println("Using "+hostName+":"+portNumber+"  debuglevel "+debugLevel);
 				break;
 			default:
 				System.out.println("Usage: client hostname portnumber debuglevel");
@@ -120,7 +120,7 @@ public class Client implements Runnable{
 				d.debug(1,"No line found. Probably means server closed socket. Exiting.");
 				System.exit(0);
 			}
-			d.debug(2,"server.Server said: "+serverMessage);
+			d.debug(2,"Server said: "+serverMessage);
 			switch(serverMessage.split(" ")[0]){
 				case "DATA":
 					String userName = serverMessage.split(" ")[1];
