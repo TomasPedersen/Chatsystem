@@ -28,7 +28,7 @@ public class Server {
 
 		switch (args.length){
 			case 2:
-				debugLevel = Integer.parseInteger(args[1]);
+				debugLevel = Integer.parseInt(args[1]);
 			case 1:
 				portNumber = Integer.parseInt(args[0]);
 			case 0:
