@@ -1,9 +1,4 @@
 package client;
-<<<<<<< Updated upstream:src/client/Client.java
-=======
-
-import javafx.fxml.FXML;
->>>>>>> Stashed changes:src/Client.java
 
 import java.io.IOException;
 import java.io.PrintStream;

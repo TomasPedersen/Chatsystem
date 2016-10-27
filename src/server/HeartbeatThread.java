@@ -22,11 +22,8 @@ public class HeartbeatThread extends Thread {
 	@Override
 	public void run() {
 		while(true){
-<<<<<<< Updated upstream:src/server/HeartbeatThread.java
 			d.debug(3, "Heartbeat check");
-=======
-			util.Debug.debug(3, "Heartbeat check");
->>>>>>> Stashed changes:src/HeartbeatThread.java
+			d.debug(3, "Heartbeat check");
 			for (UserThread u :
 					userThreads) {
 				// Check for hver userThread om forskellen mellem lastHeartbeat og now() er mere end 59 sekunder.
