@@ -12,18 +12,17 @@ import util.*;
  * Connect to server.
  */
 public class Client implements Runnable{
-    private static Socket clientSocket = null;
-    private static PrintStream outputStream = null;
-    private static Scanner inputStream = null;
-	private static String nick = null;
-	private static Scanner userScanner = null;
-	private static String userMessage = null;
-	private static String serverMessage = null;
-	private static boolean JOIN_OK = false;
+    private Socket clientSocket = null;
+    private PrintStream outputStream = null;
+    private Scanner inputStream = null;
+	private String nick = null;
+	private Scanner userScanner = null;
+	private String userMessage = null;
+	private String serverMessage = null;
 	static Debug d;		// Initialiser Debug object. Skal importeres static i andre klasser.
 
-	public static void main(String[] args) {
-		// Default værdier hvis intet angivet på kommandolinie.
+	public void client(String[] args) {
+		// Default værdier hvis intet angivet i args.
 		String hostName = "localhost";
 		int portNumber = 2222;
 		int debugLevel = 0;
@@ -53,31 +52,7 @@ public class Client implements Runnable{
 			e.printStackTrace();
 		}
 
-		// Indtast brugernavn
-		userScanner = new Scanner(System.in);
-		while (!JOIN_OK) {
-			System.out.print("Indtast brugernavn: ");
-			while( !(userNameOK(nick = userScanner.nextLine())) );	// Indtast brugernavn og check om nick overholder kravene.
-
-			//Join server.
-			outputStream.println("JOIN "+nick);
-			d.debug(2,"Sent to server:  JOIN "+nick);
-
-			// Vent på J_OK eller J_ERR
-			// Fortsæt til main loop ved J_OK, ellers gentag indtast brugernavn.
-			serverMessage = inputStream.nextLine();
-			switch (serverMessage){
-				case "J_OK":
-					System.out.println("Join accepteret af server");
-					JOIN_OK = true;
-					break;
-				case "J_ERR":
-					System.out.println("Brugernavn afvist af server");
-					break;
-				default:
-					System.out.println("Server sendte ukendt besked: "+ serverMessage);
-			}
-		}
+		// TODO while(!join());	// Vent på at server accepterer join.
 
 		// server.Server har accepteret brugernavn.
 		// Start tråd til at læse fra server.
